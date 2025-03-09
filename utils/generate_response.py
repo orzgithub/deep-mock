@@ -3,7 +3,7 @@ import flask
 import json5
 
 
-def generate_response(request: dict):
+async def generate_response(request: dict):
     aiclient = flask.current_app.aiclient
     aimessage = flask.current_app.message
     aimessage.append(
@@ -12,7 +12,7 @@ def generate_response(request: dict):
             'content': json5.dumps(request, ensure_ascii=False, indent=2)
         }
     )
-    response = aiclient.chat.completions.create(
+    response = await aiclient.chat.completions.create(
         model=flask.current_app.model,
         messages=aimessage,
         temperature=0.2

@@ -10,7 +10,7 @@ app = flask.Flask(__name__)
 
 
 @app.route('/<path:path>', methods=['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS', 'HEAD', 'TRACE', 'CONNECT'])
-def anypath(path):
+async def anypath(path):
     structure = {
         "url": "/" + path,
         "method": flask.request.method,
@@ -20,7 +20,7 @@ def anypath(path):
         "body": flask.request.json if flask.request.is_json else flask.request.get_data().decode(),
         "form": flask.request.form.to_dict(),
     }
-    generated = generate_response(structure)
+    generated = await generate_response(structure)
     return (
         generated['body'] if generated['body'] is not None else "",
         generated['code'],
@@ -35,7 +35,7 @@ if __name__ == '__main__':
     parser.add_argument('--model', '-M', type=str, help="Model name", required=True)
     parser.add_argument('--api', '-A', type=str, help="API description", required=True)
     app.model = parser.parse_args().model
-    app.aiclient = openai.OpenAI(
+    app.aiclient = openai.AsyncOpenAI(
         base_url=parser.parse_args().url,
         api_key=parser.parse_args().key,
     )
