@@ -6,7 +6,31 @@ import openai
 from utils.generate_response import generate_response
 from utils.system_prompt_generator import system_prompt_generator
 
-app = flask.Flask(__name__)
+
+class DeepMockApp(flask.Flask):
+    def __init__(self, *app_args, **kwargs):
+        super().__init__(*app_args, **kwargs)
+        parser = argparse.ArgumentParser(
+            description='A tool based on large language model to create a mock server.')
+        parser.add_argument('--url', '-U', type=str, help="API URL", required=True)
+        parser.add_argument('--key', '-K', type=str, help="API key", required=True)
+        parser.add_argument('--model', '-M', type=str, help="Model name", required=True)
+        parser.add_argument('--api', '-A', type=str, help="API description", required=True)
+        app_args = parser.parse_args()
+        self.model = app_args.model
+        self.aiclient = openai.AsyncOpenAI(
+            base_url=app_args.url,
+            api_key=app_args.key,
+        )
+        self.message = [
+            {
+                "role": "system",
+                'content': system_prompt_generator(app_args.api)
+            }
+        ]
+
+
+app = DeepMockApp(__name__)
 
 
 @app.route('/<path:path>', methods=['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS', 'HEAD', 'TRACE', 'CONNECT'])
@@ -29,20 +53,4 @@ async def anypath(path):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='A tool based on large language model to create a mock server.')
-    parser.add_argument('--url', '-U', type=str, help="API URL", required=True)
-    parser.add_argument('--key', '-K', type=str, help="API key", required=True)
-    parser.add_argument('--model', '-M', type=str, help="Model name", required=True)
-    parser.add_argument('--api', '-A', type=str, help="API description", required=True)
-    app.model = parser.parse_args().model
-    app.aiclient = openai.AsyncOpenAI(
-        base_url=parser.parse_args().url,
-        api_key=parser.parse_args().key,
-    )
-    app.message = [
-        {
-            "role": "system",
-            'content': system_prompt_generator(parser.parse_args().api)
-        }
-    ]
     app.run()
