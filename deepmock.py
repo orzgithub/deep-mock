@@ -21,7 +21,11 @@ def anypath(path):
         "form": flask.request.form.to_dict(),
     }
     generated = generate_response(structure)
-    return (generated['body'], generated['code'], generated['header'])
+    return (
+        generated['body'] if generated['body'] is not None else "",
+        generated['code'],
+        generated['header']
+    )
 
 
 if __name__ == '__main__':
