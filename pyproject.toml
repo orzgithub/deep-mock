@@ -1,0 +1,20 @@
+[project]
+name = "Deep-Mock"
+description = "A mock server based on deep learning designed for different usages."
+version = "0.1.0"
+license = { file = "LICENSE" }
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+    "openai~=1.65.4",
+    "json5~=0.10.0",
+    "Flask~=3.1.0"
+]
+
+[project.urls]
+repository = "https://github.com/orzgithub/deep-mock"
+
+[tool.poetry.dependencies]
+openai = "~1.65.4"
+Flask = "~3.1.0"
+json5 = "~0.10.0"
